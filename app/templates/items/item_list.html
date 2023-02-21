@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container px-5 mt-3">
+        <h5>Items:</h5>
+        {% for item in items %}
+        <div class="card my-3">
+            <div class="card-body">
+                <a href="{% url 'item' item.pk %}">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                </a>
+                <p class="card-text">{{ item.description }}</p>
+                <div class="card-footer">{{ item.price }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

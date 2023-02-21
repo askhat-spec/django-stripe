@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container px-5 mt-3">
+    <h1 class="display-5 fw-bolder">{{ item.name }}</h1>
+    <div class="fs-5 mb-5">
+        <span>Price: ${{ item.price }}</span>
+    </div>
+    <p class="lead">{{ item.description }}</p>
+    <div class="d-flex">
+        <!-- <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem"> -->
+        <a href="" class="btn btn-primary" >Buy</a>
+    </div>
+</div>
+{% endblock %}
