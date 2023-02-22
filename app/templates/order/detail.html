@@ -3,7 +3,6 @@
 {% block title %} Order {% endblock %}
 
 {% block content %}
-<script src="https://js.stripe.com/v3/"></script>
 
 <div class="container py-5">
     <h2>Order</h2>
@@ -46,17 +45,14 @@
             <td>
                 <h4>Total:</h4>
             </td>
-            <td colspan="4"></td>
+            <td colspan="3"></td>
             <td class="num">$ {{ order.get_total_price }}</td>
         </tr>
     </table>
 
     <div class="mt-4">
         <div class="d-flex justify-content-end">
-            <form action='{% url "create_checkout_session" %}' method="POST" class="form-check">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary mx-2" id="checkout-button">Buy</button>
-            </form>
+            <a href="{% url 'checkout' %}" class="btn btn-primary">Checkout</a>
         </div>
     </div>
 </div>

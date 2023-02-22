@@ -1,5 +1,7 @@
+import json
 from django.conf import settings
-from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
 from django.views.generic import ListView, DetailView
 from django.views import View
 
@@ -26,7 +28,6 @@ class ItemView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['item'] = self.object
-        context['STRIPE_PUBLIC_KEY'] = settings.STRIPE_PUBLIC_KEY
         context['order_form'] = OrderAddItemForm()
         return context
 
@@ -56,3 +57,26 @@ class CreateCheckoutSessionView(View):
         )
 
         return redirect(checkout_session.url, code=303)
+
+
+class CreatePaymentIntentView(View):
+    def post(self, request):
+        order = Order(request)
+        payment_intent = stripe.PaymentIntent.create(
+            currency = 'usd',
+            amount = order.get_total_price() * 100,
+            # payment_method_types = ['card'],
+            automatic_payment_methods = {'enabled': True},
+        )
+        return JsonResponse({'clientSecret': payment_intent.client_secret})
+
+
+class CheckoutView(View):
+    template_name = 'order/checkout.html'
+    def get(self, request):
+        order = Order(request)
+        return render(request, self.template_name, {'amount': order.get_total_price()})
+
+
+def get_config(request):
+    return JsonResponse({ 'publicKey': settings.STRIPE_PUBLIC_KEY })

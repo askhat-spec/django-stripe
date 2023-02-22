@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %} Checkout {% endblock %}
+
+{% block content %}
+<script src="https://js.stripe.com/v3/"></script>
+
+<div class="container d-flex justify-content-center">
+    <div class="mt-4">
+        <form id="payment-form">
+            {% csrf_token %}
+            <div id="payment-element"></div>
+            <button class="btn btn-primary mt-2" type="submit">$ {{ amount }} Buy</button>
+            <div id="error-messages"></div>
+        </form>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        const { publicKey } = await fetch('{% url "config" %}').then(r => r.json())
+
+        const stripe = Stripe(publicKey)
+        const { clientSecret } = await fetch('{% url "create_payment_intent" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            }
+        }).then(responce => responce.json());
+    
+        const elements = stripe.elements({ clientSecret });
+        const paymentElement = elements.create('payment');
+        paymentElement.mount('#payment-element')
+
+        const form = document.getElementById('payment-form');
+        form.addEventListener('submit', async(e) => {
+            e.preventDefault();
+
+            const { error } = stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    return_url: `${window.location}success/`
+                }
+            });
+
+            if (error) {
+                const messages = document.getElementById('error-messages')
+                messages.innerText = error.message;
+            }
+
+        })
+    });
+</script>
+{% endblock %}
