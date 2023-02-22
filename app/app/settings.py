@@ -106,3 +106,11 @@ STATIC_ROOT = BASE_DIR / 'static'
 # ]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Stripe Account Credentials
+
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+
+STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+
+# X_FRAME_OPTIONS = 'SAMEORIGIN'
