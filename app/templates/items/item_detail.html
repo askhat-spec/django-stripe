@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<script src="https://js.stripe.com/v3/"></script>
+{% block title %} {{ item.name }} {% endblock %}
 
+{% block content %}
 <div class="container px-5 mt-3">
-    <h1 class="display-5 fw-bolder">{{ item.name }}</h1>
-    <div class="fs-5 mb-5">
-        <span>Price: ${{ item.price }}</span>
-    </div>
-    <p class="lead">{{ item.description }}</p>
-    <div class="d-flex">
-        <!-- <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem"> -->
-        <form action='{% url "create_checkout_session" item.id %}' method="POST">
+    <div class="col-md-4">
+        <h1 class="display-5 fw-bolder">{{ item.name }}</h1>
+        <div class="fs-5 mb-5">
+            <span>Price: ${{ item.price }}</span>
+        </div>
+        <p class="lead">{{ item.description }}</p>
+        <form class="d-flex" action='{% url "order_add" item.id %}' method="POST">
             {% csrf_token %}
-            <button type="submit" class="btn btn-primary" id="checkout-button">Buy</button>
+            {{ order_form }}
+            <button type="submit" class="btn btn-primary">Add to order</button>
         </form>
     </div>
 </div>

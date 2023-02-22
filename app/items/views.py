@@ -3,6 +3,9 @@ from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView
 from django.views import View
 
+from order.forms import OrderAddItemForm
+from order.order import Order
+
 from .models import Item
 import stripe
 
@@ -24,31 +27,29 @@ class ItemView(DetailView):
         context = super().get_context_data(**kwargs)
         context['item'] = self.object
         context['STRIPE_PUBLIC_KEY'] = settings.STRIPE_PUBLIC_KEY
+        context['order_form'] = OrderAddItemForm()
         return context
 
 
 class CreateCheckoutSessionView(View):
-    def post(self, request, pk):
-        item = Item.objects.get(pk=pk)
+    def post(self, request):
+        order = Order(request)
         domain = 'http://' + request.get_host()
+        # items = [{'product_id': item[0], **item[1]} for item in order.order.items()]
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[
                 {
                     'price_data': {
                         'currency': 'usd',
-                        'unit_amount': item.price * 100,
+                        'unit_amount': order.get_total_price() * 100,
                         'product_data': {
-                            'name': item.name,
-                            'description': item.description
+                            'name': 'test'
                         },
                     },
                     'quantity': 1,
                 },
             ],
-            metadata={
-                "product_id": item.id
-            },
             mode='payment',
             success_url= domain + '/success/',
             cancel_url= domain + '/cancel/',

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %} Order {% endblock %}
+
+{% block content %}
+<script src="https://js.stripe.com/v3/"></script>
+
+<div class="container py-5">
+    <h2>Order</h2>
+    <table class="table table-hover table-striped table-condensed mt-5">
+        <thead>
+            <tr>
+                <th scope="col">Item</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Remove</th>
+                <th scope="col">Unit price</th>
+                <th scope="col">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order %}
+                {% with product=item.item %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>
+                        <form class="d-flex" action="{% url 'order_add' product.id %}" method="post">
+                            {{ item.update_quantity_form.quantity }}
+                            {{ item.update_quantity_form.override }}
+                                <input class="btn btn-outline-dark mx-2" type="submit" value="Change">
+                            {% csrf_token %}
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{% url 'order_remove' product.id %}" method="post">
+                            <input class="btn btn-outline-dark" type="submit" value="Remove">
+                            {% csrf_token %}
+                        </form>
+                    </td>
+                    <td>$ {{ item.price }}</td>
+                    <td>$ {{ item.total_price }}</td>
+                </tr>
+                {% endwith %}
+            {% endfor %}
+        </tbody>
+        <tr class="total">
+            <td>
+                <h4>Total:</h4>
+            </td>
+            <td colspan="4"></td>
+            <td class="num">$ {{ order.get_total_price }}</td>
+        </tr>
+    </table>
+
+    <div class="mt-4">
+        <div class="d-flex justify-content-end">
+            <form action='{% url "create_checkout_session" %}' method="POST" class="form-check">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary mx-2" id="checkout-button">Buy</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
